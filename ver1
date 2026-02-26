@@ -1,0 +1,100 @@
+
+include 'include/macro/if.inc';
+macro wyjdz code;
+{;
+		mov rax, 60;
+		mov rdi, code;
+		syscall;
+};
+macro ssyscall instr, a,b,c,d,e,f{;
+		if 	~a eq;
+		mov rdi, a;
+		end if;
+		if ~b eq;
+		mov rsi, b;
+		end if;
+		if ~c eq;
+		mov rdx, c;
+		end if;
+		if ~d eq;
+		mov r10, d;
+		end if;
+		if ~e eq;
+		mov r8, e;
+;
+		end if;
+		if ~f eq;
+		mov r9, f;
+;
+		end if;
+;
+		mov rax, instr;
+		syscall;
+};
+;
+;
+macro gets buff{;
+mov rax, 0;
+mov rdi, 0;
+mov rsi, buff;
+mov rdx, 128;
+syscall;
+mov r8, rax;
+};
+;
+macro getsS buff{;
+mov rax, 0;
+mov rdi, 0;
+mov rsi, buff;
+mov rdx, 2;
+syscall;
+mov r8, rax;
+};
+
+macro print_cyfra cyfra{ ; okupuje r15 i ax
+		push r15
+		push rax
+		mov ax, cyfra
+		mov r15b, 10
+		div r15b
+		shr ax, 8 ;zamiast mov al, ah
+		add al, '0'
+		mov [buffS], al
+		print buffS
+		print nl
+		pop ax
+		pop rax
+}
+
+macro print text_addr{;
+		movzx rax,byte[text_addr];
+		xor r9, r9 ;counter;
+		.while ~rax = 0;
+		inc r9;
+		movzx rax,byte[text_addr+r9];
+		.endw;
+		;
+		ssyscall 1,1,text_addr, r9;len;
+};
+;
+format ELF64 executable 3;
+;
+entry $;
+
+		wyjdz 4;
+;
+;
+;
+;
+segment readable writable;
+		nl db 10,0;
+
+		;msg db "-=-=Ctr-alt-f3=-=-",10,0;
+
+		buffS db ?,0;
+	;	buff1 rb 128;
+	;	buff2 rb 128;
+	;	buff3 rb 128;
+	;	buff4 rb 128;
+		;
+		;
